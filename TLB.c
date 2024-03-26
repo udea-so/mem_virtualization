@@ -1,9 +1,11 @@
-/*
- * File: TLB.c
- * Author: Danny Munera
- * Date: March 7, 2024
- * Description: This code implements the TLB algorithm
- */
+/***********************************************************************************************************************************
+   @file      TLB.c
+   @author    Danny Munera
+   @brief     ToDo...
+   @date      March 7, 2024
+
+   This is an example program ...
+***********************************************************************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +46,7 @@ int main(int argc, char *argv[]) {
     // Calculate the CPU time in nanoseconds
     cpu_time = (end.tv_sec - start.tv_sec) * 1000000000 + (end.tv_nsec - start.tv_nsec);
 
-    printf("CPU time: %ld nanoseconds\n", cpu_time/(trials * pages));
+    printf(" -> CPU time: %ld nanoseconds\n", cpu_time/(trials * pages));
 
     return 0;
 }
