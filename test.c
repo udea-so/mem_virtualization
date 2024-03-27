@@ -1,4 +1,3 @@
-
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,21 +33,18 @@ void printInfoMem(char *sizeMem);
 long getMult(char *value_str);
 long getNumValue(char *value_str);
 long getPA(long va);
+int getIntegerValue(char *value_str);
 
 int main(int argc, char *argv[]) {
     // default values
+
     vm_size = 1024;
     strcpy(args[BOUNDS_REG],"1k");
     pm_size = 16 * 1024;
     strcpy(args[SIZE_PM],"16k");
-    printInfoMem(args[BOUNDS_REG]);
-    printf("\n");
-    printInfoMem(args[SIZE_PM]);
-
-
-
-    opterr = 0;
-
+    // printInfoMem(args[BOUNDS_REG]);
+    // printf("\n");
+    // printInfoMem(args[SIZE_PM]);
     int c;
     // https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
 
@@ -74,9 +70,15 @@ int main(int argc, char *argv[]) {
             break;
         case 'h':
             usage();
-            break;  
+            exit(0);
         }
     }
+    
+    // strcpy(args[SIZE_PM],"64k");
+    // strcpy(args[VA], "3300");
+    // strcpy(args[BASE_REG],"16k");
+    // strcpy(args[BOUNDS_REG],"4k");
+    
 
     // Verifica que los requerimientos minimos se cumplan
     assert(strlen(args[VA]) != 0);
@@ -85,37 +87,18 @@ int main(int argc, char *argv[]) {
     for(int i = 0; i < MAX_ARGS; i++) {
         data[i] = getNumValue(args[i]);
     } 
-
     long pa = getPA(data[VA]);
     int n_PA = (int)log2(data[SIZE_PM]);
     int n_VA = (int)log2(data[BOUNDS_REG]);
-    // ltoa
+
     char phys_addr[SIZE], virt_addr[SIZE];
     //ltoa(virt_addr,data[VA],size_VM);
-    sprintf(virt_addr, "%lx", data[VA]);
+    sprintf(virt_addr, "%lX", data[VA]);
     // ltoa(phys_addr,data[SIZE_PM],size_PM);
-    sprintf(phys_addr, "%lx", pa);    
-    printf("VA = 0x%.*s = (decimal: %ld)\n", (int)(n_VA/4), virt_addr, data[VA]);
-    printf("PA = 0x%.*s = (decimal: %ld)\n", (int)(n_PA/4), phys_addr, pa);
+    sprintf(phys_addr, "%lX", pa);    
 
-    
-
-
-
-    
-
-    
-
-    /*
-    printf("Base   : %llx (decimal %lld)\n", base_reg, base_reg);
-    printf("Limit  : %lld\n",bounds_reg);
-    assert(va >= 0);
-    assert(base_reg >= 0);
-    assert(bounds_reg >= 0);
-    assert(base_reg + bounds_reg >= pm_size);
-    */
-    // OK
-
+    printf("VA = 0x%.*s (decimal: %ld)\n", (int)(n_VA/4), virt_addr, data[VA]);
+    printf("PA = 0x%.*s (decimal: %ld)\n", (int)(n_PA/4), phys_addr, pa);
     return 0;
 }
 
@@ -130,34 +113,38 @@ void usage(void)
     fprintf(stderr, "  -l <Base Register>\n");
     // fprintf(stderr, "  -v [ verbose flag: trace what is happening and print it ]\n");
     //  fprintf(stderr, "  -t [ timing flag: time entire execution and print total time ]\n");
-    exit(1);
+    // exit(1);
 }
 
 // https://www.ibm.com/docs/es/i/7.5?topic=functions-strncpy-copy-strings
 // https://www.ibm.com/docs/es/i/7.5?topic=files-stringh#stringh
-int getIntegerValue(char *value_str)
-{
+int getIntegerValue(char *value_str) {
     char num_str[SIZE];
     int end_index = strlen(value_str) - 1;
-    strncpy(num_str, value_str, end_index);
-    num_str[end_index] = '\0'; // *(num_str + end_index) = '\0';
+    if(isalpha(value_str[end_index])) {     
+        strncpy(num_str, value_str, end_index);
+        num_str[end_index] = '\0'; // *(num_str + end_index) = '\0';
+    }
+    else {
+        strcpy(num_str, value_str);
+    }
     return atoi(num_str);
 }
 
 long getMult(char *value_str) {
     int end_index = strlen(value_str) - 1;
     char char_mult = value_str[end_index];
-    long mult = 1ULL;
+    long mult = 1L;
     if (isalpha(char_mult)) {
         switch (char_mult) {
         case 'k':
-            mult = 1024ULL;
+            mult = 1024L;
             break;
         case 'm':
-            mult = 1024 * 1024ULL;
+            mult = 1024 * 1024L;
             break;
         case 'g':
-            mult = 1024 * 1024 * 1024ULL;
+            mult = 1024 * 1024 * 1024L;
             break;
         default:
             break;
